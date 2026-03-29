@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<h2>Register</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="registerUser()">Register</button>
+
+<script type="module">
+import { register } from './js/auth.js';
+function registerUser() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  register(email, password);
+}
+</script>
+</body>
+</html>
