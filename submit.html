@@ -1,0 +1,28 @@
+<h2>Submit Task</h2>
+<input type="file" id="file">
+<input type="text" id="postlink" placeholder="Post Link">
+<button onclick="submitTask()">Submit</button>
+
+<script src="js/firebase.js"></script>
+<script>
+function submitTask() {
+  const file = document.getElementById("file").files[0];
+  const link = document.getElementById("postlink").value;
+  const taskId = new URLSearchParams(window.location.search).get("id");
+  const userId = auth.currentUser.uid;
+
+  const storageRef = storage.ref("proofs/"+file.name);
+  storageRef.put(file).then(()=>{
+    storageRef.getDownloadURL().then(url=>{
+      db.collection("submissions").add({
+        taskId:taskId,
+        userId:userId,
+        proof:url,
+        postLink:link,
+        status:"pending"
+      });
+      alert("Task Submitted!");
+    });
+  });
+}
+</script>
