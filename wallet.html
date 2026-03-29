@@ -1,0 +1,13 @@
+<h2>Your Wallet</h2>
+<div id="balance"></div>
+
+<script src="js/firebase.js"></script>
+<script>
+auth.onAuthStateChanged(user=>{
+  if(user){
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      document.getElementById("balance").innerText = doc.data().balance + " Tk";
+    });
+  }
+});
+</script>
