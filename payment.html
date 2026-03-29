@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guild Glory Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+background:linear-gradient(135deg,#020617,#020c1b,#000814);
+color:white;
+font-family:'Montserrat',sans-serif;
+text-align:center;
+display:flex;
+flex-direction:column;
+min-height:100vh;
+}
+
+.top-brand{
+padding:25px;
+font-family:'Orbitron';
+font-size:28px;
+font-weight:900;
+letter-spacing:4px;
+background:linear-gradient(90deg,#06b6d4,#22d3ee,#06b6d4);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.liveBar{
+overflow:hidden;
+background:#020617;
+border-top:1px solid #22d3ee33;
+border-bottom:1px solid #22d3ee33;
+padding:8px 0;
+font-size:13px;
+color:#22d3ee;
+white-space:nowrap;
+}
+
+.liveTrack{
+display:inline-block;
+animation:scrollPayments 18s linear infinite;
+}
+
+@keyframes scrollPayments{
+from{transform:translateX(100%);}
+to{transform:translateX(-100%);}
+}
+
+.livePlayers{
+font-size:13px;
+color:#22d3ee;
+margin-top:6px;
+}
+
+.section{padding:40px 20px;flex:1;}
+
+.planBtn{
+margin:8px;
+padding:10px 18px;
+border-radius:8px;
+border:1px solid #22d3ee55;
+background:#020617;
+color:#22d3ee;
+cursor:pointer;
+}
+
+.planBtn.active{
+background:linear-gradient(90deg,#06b6d4,#22d3ee);
+color:white;
+}
+
+.qr-wrapper{
+display:inline-block;
+padding:10px;
+border-radius:16px;
+background:linear-gradient(45deg,#06b6d4,#22d3ee,#0ea5e9);
+margin-top:20px;
+transition:.4s;
+}
+
+.qr-wrapper.success{
+box-shadow:0 0 25px #22d3ee;
+}
+
+.qr-wrapper img{
+background:#000814;
+padding:10px;
+border-radius:12px;
+}
+
+input{
+padding:13px 20px;
+background:#020617;
+border:1px solid #22d3ee55;
+color:white;
+border-radius:10px;
+margin-top:20px;
+width:270px;
+}
+
+button{
+margin-top:20px;
+padding:14px 42px;
+background:linear-gradient(90deg,#06b6d4,#22d3ee);
+border:none;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+color:white;
+}
+
+.hidden{display:none;}
+
+.popup{
+position:fixed;
+bottom:20px;
+left:20px;
+background:#020617;
+border:1px solid #22d3ee55;
+padding:12px 18px;
+border-radius:12px;
+font-size:13px;
+color:#22d3ee;
+opacity:0;
+transform:translateY(30px);
+transition:.4s;
+}
+
+.popup.show{
+opacity:1;
+transform:translateY(0);
+}
+
+footer{
+background:#000814;
+color:#94a3b8;
+font-size:13px;
+padding:25px;
+margin-top:auto;
+border-top:1px solid #22d3ee22;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top-brand">⚡ Guild Glory System</div>
+
+<div class="livePlayers" id="livePlayers">
+👥 Live Players: 1287
+</div>
+
+<div class="liveBar">
+<div class="liveTrack" id="livePayments">
+Loading Live Payments...
+</div>
+</div>
+
+<section class="section">
+
+<h2>Select Plan</h2>
+
+<button class="planBtn active" onclick="selectPlan('p99',this)">₹99</button>
+<button class="planBtn" onclick="selectPlan('p149',this)">₹149</button>
+<button class="planBtn" onclick="selectPlan('p299',this)">₹299</button>
+
+<h2 style="margin-top:20px;">Scan & Complete Payment</h2>
+
+<div class="qr-wrapper" id="qrWrap">
+<img id="qrImage" width="220">
+</div>
+
+<h3 style="margin-top:25px;">Enter UTR</h3>
+<input type="text" id="utrInput" placeholder="Enter Payment UTR">
+
+<br>
+<button onclick="verifyUTR()">Verify UTR ✅</button>
+
+<div id="utrStatus" style="margin-top:10px;color:#22d3ee;"></div>
+
+<button id="smsBtn" class="hidden" onclick="sendWhatsApp()">Send Details 📩</button>
+
+</section>
+
+<footer>
+⚡ GLORY X VIP SYSTEM<br>
+Secure • Fast • Automated Glory Upgrade<br>
+© 2026 DRIP CLIENT
+</footer>
+
+<div class="popup" id="popup"></div>
+
+<audio id="paySound" src="https://assets.mixkit.co/active_storage/sfx/270/270-preview.mp3"></audio>
+
+<script>
+
+/* ===========================
+   USER DATA LOAD (AUTO SYSTEM)
+=========================== */
+
+const uid = localStorage.getItem("guildUID");
+const country = localStorage.getItem("country");
+const planName = localStorage.getItem("planName");
+const planPrice = localStorage.getItem("planPrice");
+const planGlory = localStorage.getItem("planGlory");
+
+/* अगर direct payment page खोला */
+if(!uid || !country || !planPrice){
+alert("Session Expired. Start Again.");
+window.location.href="index.html";
+}
+
+/* SETTINGS */
+const upiID="guildglorybot@ptyes";
+const whatsappNumber="9953794428";
+
+/* PLAN AUTO LOAD */
+const plans={
+p99:{name:"Starter Boost",price:99},
+p149:{name:"Pro Boost",price:149},
+p299:{name:"Ultra Boost",price:299}
+};
+
+/* AUTO SELECT PLAN FROM HOME */
+let selectedPlan={
+name:planName,
+price:planPrice
+};
+
+/* ===========================
+   QR GENERATOR (AUTO AMOUNT)
+=========================== */
+
+function generateQR(){
+
+let upiLink=`upi://pay?pa=${upiID}&pn=GUILDGLORY&am=${selectedPlan.price}&cu=INR`;
+
+let qrURL=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiLink)}`;
+
+document.getElementById("qrImage").src=qrURL;
+}
+
+generateQR();
+
+/* ===========================
+   PLAN BUTTON CLICK (MANUAL)
+=========================== */
+
+function selectPlan(plan,btn){
+
+selectedPlan=plans[plan];
+generateQR();
+
+document.querySelectorAll(".planBtn")
+.forEach(b=>b.classList.remove("active"));
+
+btn.classList.add("active");
+}
+
+/* ===========================
+   VERIFY UTR
+=========================== */
+
+function verifyUTR(){
+
+let utr=document.getElementById("utrInput").value.trim();
+const status=document.getElementById("utrStatus");
+
+if(utr===""){
+status.style.color="red";
+status.innerText="Enter UTR First ❌";
+return;
+}
+
+status.style.color="#22d3ee";
+status.innerText="Payment Verified ✅";
+
+document.getElementById("smsBtn").classList.remove("hidden");
+
+const wrap=document.getElementById("qrWrap");
+wrap.classList.add("success");
+setTimeout(()=>wrap.classList.remove("success"),1200);
+
+}
+
+/* ===========================
+   SEND FULL DETAILS WHATSAPP
+=========================== */
+
+function sendWhatsApp(){
+
+let utr=document.getElementById("utrInput").value;
+
+let message=
+`🔥 GUILD GLORY PAYMENT
+
+👤 UID: ${uid}
+🌍 Country: ${country}
+
+💎 Plan: ${selectedPlan.name}
+💰 Amount: ₹${selectedPlan.price}
+⚡ Glory: ${planGlory}
+
+🧾 UTR: ${utr}
+
+✅ Auto Submitted via Guild Glory System`;
+
+let waURL=`https://wa.me/91${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+window.open(waURL,"_blank");
+}
+
+/* ===========================
+   LIVE PLAYERS
+=========================== */
+
+let players=1287;
+setInterval(()=>{
+players+=Math.random()>0.5?6:-4;
+players=Math.max(900,Math.min(2200,players));
+document.getElementById("livePlayers").innerText=
+"👥 Live Players: "+Math.floor(players);
+},2500);
+
+/* ===========================
+   LIVE PAYMENTS FAKE STREAM
+=========================== */
+
+const names=["Rahul","Aman","ShadowX","DragonYT","Viper","Ghost","Legend","Aryan","Blaze","SniperX"];
+const prices=[99,149,299];
+
+function generatePayments(){
+let text="";
+for(let i=0;i<20;i++){
+let n=names[Math.floor(Math.random()*names.length)];
+let p=prices[Math.floor(Math.random()*prices.length)];
+text+=`✅ ${n} purchased ₹${p} • `;
+}
+document.getElementById("livePayments").innerText=text;
+}
+generatePayments();
+setInterval(generatePayments,12000);
+
+/* ===========================
+   POPUP PURCHASE EFFECT
+=========================== */
+
+const popup=document.getElementById("popup");
+const sound=document.getElementById("paySound");
+
+function showPopup(){
+
+let n=names[Math.floor(Math.random()*names.length)];
+let p=prices[Math.floor(Math.random()*prices.length)];
+
+popup.innerText=`${n} purchased Glory Boost ₹${p}`;
+popup.classList.add("show");
+
+sound.currentTime=0;
+sound.play();
+
+setTimeout(()=>popup.classList.remove("show"),3500);
+}
+
+setInterval(showPopup,8000);
+
+</script>
+
+</body>
+</html>

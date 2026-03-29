@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ZEXISTEY AI SYSTEM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+height:100vh;
+font-family:'Inter',sans-serif;
+background:linear-gradient(135deg,#0b0f1f,#05070f);
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+overflow:hidden;
+}
+
+/* SOFT GRADIENT LIGHT */
+body::before{
+content:"";
+position:fixed;
+width:700px;
+height:700px;
+background:radial-gradient(circle,#6d28ff33,transparent);
+top:-200px;
+right:-200px;
+animation:move 14s infinite alternate ease-in-out;
+z-index:-1;
+}
+
+@keyframes move{
+to{transform:translate(-150px,120px);}
+}
+
+/* MAIN CARD */
+.card{
+width:92%;
+max-width:520px;
+padding:48px 38px;
+border-radius:22px;
+background:rgba(20,24,45,.85);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.08);
+box-shadow:0 20px 60px rgba(0,0,0,.6);
+text-align:center;
+animation:fade .9s ease;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(40px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+/* BOT IMAGE */
+.bot{
+margin-bottom:18px;
+animation:float 5s ease-in-out infinite;
+}
+
+.bot img{
+width:85px;
+filter:drop-shadow(0 0 15px #22d3ee);
+}
+
+@keyframes float{
+50%{transform:translateY(-8px);}
+}
+
+/* TITLE */
+.title{
+font-family:'Orbitron';
+font-size:32px;
+letter-spacing:2px;
+background:linear-gradient(90deg,#7c3aed,#22d3ee);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+margin-bottom:12px;
+}
+
+/* TERMINAL TEXT */
+.subtitle{
+font-family:monospace;
+color:#22d3ee;
+font-size:14px;
+height:22px;
+margin-bottom:28px;
+}
+
+.cursor{
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+50%{opacity:0;}
+}
+
+/* FEATURE BOX */
+.features{
+text-align:left;
+padding:20px;
+border-radius:14px;
+background:linear-gradient(
+145deg,
+rgba(30,35,70,.8),
+rgba(15,18,40,.8)
+);
+border:1px solid rgba(124,58,237,.25);
+margin-bottom:32px;
+color:#cbd5ff;
+font-size:14px;
+line-height:1.7;
+}
+
+/* BUTTON */
+.startBtn{
+display:inline-block;
+padding:15px 36px;
+border-radius:12px;
+font-family:'Orbitron';
+font-size:16px;
+letter-spacing:1px;
+text-decoration:none;
+color:white;
+background:linear-gradient(90deg,#7c3aed,#22d3ee);
+transition:.3s;
+}
+
+.startBtn:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 25px rgba(124,58,237,.6);
+}
+
+/* FOOTER */
+.footer{
+position:absolute;
+bottom:18px;
+font-size:12px;
+color:#7c82a8;
+letter-spacing:1px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="bot">
+<img src="https://i.ibb.co/PvQ6cXnq/image.png" alt="Bot">
+</div>
+
+<div class="title">HALLS 🔰 SYSTEM</div>
+
+<div class="subtitle">
+<span id="terminalText"></span><span class="cursor">|</span>
+</div>
+
+<div class="features" id="featureBox"></div>
+
+<a href="dashboard.html" class="startBtn">☠︎︎ ENTER SYSTEM</a>
+
+</div>
+
+<div class="footer">
+👽 Halls Bot • Premium AI Interface
+</div>
+
+<script>
+
+/* TERMINAL TEXT */
+const lines=[
+"Booting AI Core...",
+"Establishing Secure Connection...",
+"Synchronizing Bot Network...",
+"System Ready."
+];
+
+let li=0,ci=0;
+const text=document.getElementById("terminalText");
+
+function type(){
+if(ci<lines[li].length){
+text.innerHTML+=lines[li].charAt(ci);
+ci++;
+setTimeout(type,35);
+}else{
+setTimeout(erase,1400);
+}
+}
+
+function erase(){
+if(ci>0){
+text.innerHTML=lines[li].substring(0,ci-1);
+ci--;
+setTimeout(erase,18);
+}else{
+li=(li+1)%lines.length;
+setTimeout(type,300);
+}
+}
+type();
+
+/* FEATURE TERMINAL */
+const features=[
+"✔ Secure AI Protection Layer",
+"✔ Real-Time Bot Monitoring",
+"✔ Advanced Guild Automation",
+"✔ Premium Neural Engine Enabled"
+];
+
+let f=0,c=0;
+const box=document.getElementById("featureBox");
+
+function featureType(){
+if(f<features.length){
+if(c<features[f].length){
+box.innerHTML+=features[f].charAt(c);
+c++;
+setTimeout(featureType,18);
+}else{
+box.innerHTML+="<br>";
+f++;c=0;
+setTimeout(featureType,350);
+}
+}
+}
+featureType();
+
+</script>
+
+</body>
+</html>
