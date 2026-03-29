@@ -1,0 +1,16 @@
+<h2>Login</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password">
+<button onclick="login()">Login</button>
+
+<script src="js/firebase.js"></script>
+<script>
+function login() {
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email,password)
+  .then(()=> window.location="dashboard.html")
+  .catch(err=>alert(err.message));
+}
+</script>
