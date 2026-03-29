@@ -1,0 +1,14 @@
+<h2>Add Task</h2>
+<input id="title" placeholder="Task Title">
+<input id="reward" placeholder="Reward">
+<button onclick="addTask()">Add Task</button>
+
+<script src="../js/firebase.js"></script>
+<script>
+function addTask(){
+  const title=document.getElementById("title").value;
+  const reward=document.getElementById("reward").value;
+  db.collection("tasks").add({title:title, reward:Number(reward), status:"active"});
+  alert("Task Added!");
+}
+</script>
